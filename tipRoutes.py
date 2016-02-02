@@ -1,5 +1,5 @@
-from flask import Flask
-
+from flask import Flask, jsonfify
+from flask_security import auth_token_required
 
 app = Flask(__name__)
 
