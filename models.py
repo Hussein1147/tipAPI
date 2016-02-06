@@ -33,7 +33,7 @@ class Role(Base, RoleMixin):
         
     def __repr__ (self):
         return '<Role %r>' % self.name
-  
+ 
 class User(Base, UserMixin):
     __tablename__ = 'auth_user'
     
@@ -53,13 +53,20 @@ class User(Base, UserMixin):
 
     def __repr__(self):
         return '<User % >' % self.email
+        
+class Card(Base):
+    __tablename__ = 'card'
+    id = db.Column(db.Integer,primary_key=True)
+    CardNumber = db.Column(db.BigInteger)
+    expMonth = db.Column(db.Integer)
+    expYear = db.Column(db.Integer)
+    User_id = db.Column(db.Integer,db.ForeignKey('auth_user.id'))
+    user = db.relationship(User)
+    
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
 security = Security()
 security.init_app(app, user_datastore)
-db.create_all()
 @app.before_first_request
 def create_user():
     db.create_all()
-    if not User.query.first():
-        user_datastore.create_user(email='test@example.com', password ='test123')
-        db.session.commit()
+   

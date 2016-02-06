@@ -15,7 +15,33 @@ def dummyAPI():
         "Key2": "value2"
     }
     return jsonify(items=dict)
+@app.route('/add_Card',methods=['Post'])
+def addCard():
+    data = request.get_json(force=True)
     
+    userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
+    userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
+    userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
+    try:    
+            person = User.query.filter(User.email == userEmail).one()
+            #create and add User Card
+            new_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=person)
+            db.session.add(new_card)
+            db.session.commit()
+            return jsonify(
+        success = True,
+        data = {
+            'msg': 'Success!! created User!',
+        }
+    )
+        
+    except IntegrityError, e:
+        db.session.rollback()
+        return Response(e)
+    except InvalidRequestError, e:
+        db.session.rollback()
+        return Response(e)    
 
 @app.route('/create_user', methods=['POST'])
 def createUser():
