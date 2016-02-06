@@ -5,13 +5,17 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@127.0.0.1:59892/tip'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@127.0.0.1:59891/tip'
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'requiem_for_a_dream'
 app.config['SECURITY_TRACKABLE'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['WTF_CSRF_ENABLED'] = False
+app.config['SECRET_KEY'] = 'super secret key'
 db = SQLAlchemy(app)
-role_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
+
+
+roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
 class Base(db.Model):
     __abstract__ = True
@@ -30,7 +34,7 @@ class Role(Base, RoleMixin):
     def __repr__ (self):
         return '<Role %r>' % self.name
   
-class User(Base,UserMixin):
+class User(Base, UserMixin):
     __tablename__ = 'auth_user'
     
     email = db.Column(db.String(255), nullable=False, unique=True)
@@ -41,15 +45,21 @@ class User(Base,UserMixin):
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
-    def __repr__(self):
-        return '<User %>' % self.email
+    last_login_ip = db.Column(db.String(45))
+    current_login_ip = db.Column(db.String(45))
+    login_count = db.Column(db.Integer)
+    roles = db.relationship('Role', secondary= roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
 
+    def __repr__(self):
+        return '<User % >' % self.email
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
-security = Security(app, user_datastore)
+security = Security()
+security.init_app(app, user_datastore)
 db.create_all()
 @app.before_first_request
 def create_user():
     db.create_all()
     if not User.query.first():
-        user_datastore.create_user(email='test@example.com', password='test123')
+        user_datastore.create_user(email='test@example.com', password ='test123')
         db.session.commit()
