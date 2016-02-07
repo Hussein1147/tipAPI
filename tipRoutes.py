@@ -1,12 +1,12 @@
 import unicodedata
 import sys, os
+import stripe
 from flask import Flask, jsonify, Response, request
 from flask_security import auth_token_required, http_auth_required
 from models import app, user_datastore,User,db
 from sqlalchemy.exc import IntegrityError,InvalidRequestError
 #Should be false in production mode
 app.config['PROPAGATE_EXCEPTIONS'] =True
-
 @app.route('/dummy-api')
 @auth_token_required
 def dummyAPI():
@@ -15,26 +15,58 @@ def dummyAPI():
         "Key2": "value2"
     }
     return jsonify(items=dict)
-@app.route('/add_Card',methods=['Post'])
+
+@app.route('/add_accounts',methods=['Post'])
 def addCard():
     data = request.get_json(force=True)
-    
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     userCardNumber=unicodedata.normalize('NFKD', data['userCardNumber']).encode('ascii','ignore')
     userExpMonth=unicodedata.normalize('NFKD', data['userExpMonth']).encode('ascii','ignore')
     userExpYear=unicodedata.normalize('NFKD', data['userExpYear']).encode('ascii','ignore')
     try:    
-            person = User.query.filter(User.email == userEmail).one()
-            #create and add User Card
-            new_card = Card(CardNumber=userCardNumber,expMonth=userExpMonth,expYear=userExpYear,user=person)
-            db.session.add(new_card)
+            c1 = User.query.filter(User.email == userEmail).one()
+            ##creating tokens
+            token1 = stripe.Token.create(
+            card={
+                "number":userCardNumber,
+                "exp_month":userExpMonth,
+                "exp_year": userExpYear,
+                'default_for_currency' : 'true',
+                'currency' : 'usd'
+                },
+                )
+        
+            token2 = stripe.Token.create(
+            card={
+                "number": userCardNumber,
+                "exp_month":userExpMonth,
+                "exp_year": userExpYear,
+                'default_for_currency' : 'true',
+                'currency' : 'usd'
+                },
+                )
+            des = "Customer for"+" "+ userEmail
+             cus1 = stripe.Customer.create(
+             description =des,
+             source=token1.id
+            )
+            ##setting up stripe account
+            stpacc1 = stripe.Account.create(
+            country='US',
+            managed=True,
+            email = userEmail,
+            external_account = token2.id,
+            )
+            c1.stpak = stpacc1.id
+            c1.custid = cus1.id
+            db.session.add(c1)
             db.session.commit()
             return jsonify(
-        success = True,
-        data = {
+            success = True,
+            data = {
             'msg': 'Success!! created User!',
-        }
-    )
+            }
+            )
         
     except IntegrityError, e:
         db.session.rollback()
@@ -43,6 +75,40 @@ def addCard():
         db.session.rollback()
         return Response(e)    
 
+@app.route('/tip', methods = ['POST'])
+def tip():
+    data = request.get_json(force=True)
+    userEmail = unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    receipientEmail = unicodedata.normalize('NFKD', data['repEmail']).encode('ascii','ignore')
+    amt =  unicodedata.normalize('NFKD', data['amount']).encode('ascii','ignore')
+    user1 = User.query.filter(User.email == userEmail).one()
+    cust_id1 = user1.custid
+    user2 = User.query.filter(User.email == receipientEmail).one()
+    stpacc2 = user2.stpak
+    try:
+        charge = stripe.Charge.create(
+            description="test.py",
+            amount = amt,
+            currency = "usd",
+            customer= cust_id1.id
+            )
+         des = "Transfer for" + " " + userEmail   
+        transfer = stripe.Transfer.create(
+        amount = amt,
+        currency="usd",
+        destination = stpacc2,
+        source_transaction = charge.id,
+        description="Transfer for test@example.com"
+        )
+        
+    except stripe.error.CardError, e:
+        body = e.json_body
+        err  = body['error']
+        return Response(json.dumps(err))
+    except stripe.error.InvalidRequestError, e:
+         body = e.json_body
+         err  = body['error']
+         return Response(json.dumps(err))
 @app.route('/create_user', methods=['POST'])
 def createUser():
     data = request.get_json(force=True)

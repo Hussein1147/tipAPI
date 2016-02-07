@@ -48,20 +48,15 @@ class User(Base, UserMixin):
     last_login_ip = db.Column(db.String(45))
     current_login_ip = db.Column(db.String(45))
     login_count = db.Column(db.Integer)
+    stpak = db.Column(db.String(255))
+    custid = db.Column(db.String(255))
+    authTok = db.Cloumn(db.String(255))
     roles = db.relationship('Role', secondary= roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User % >' % self.email
         
-class Card(Base):
-    __tablename__ = 'card'
-    id = db.Column(db.Integer,primary_key=True)
-    CardNumber = db.Column(db.BigInteger)
-    expMonth = db.Column(db.Integer)
-    expYear = db.Column(db.Integer)
-    User_id = db.Column(db.Integer,db.ForeignKey('auth_user.id'))
-    user = db.relationship(User)
     
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
 security = Security()
