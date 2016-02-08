@@ -3,7 +3,7 @@ import sys, os
 import stripe
 from flask import Flask, jsonify, Response, request
 from flask_security import auth_token_required, http_auth_required
-from models import app, user_datastore,User,db
+from models import app, user_datastore,User,db,Transfers
 from sqlalchemy.exc import IntegrityError,InvalidRequestError
 #Should be false in production mode
 app.config['PROPAGATE_EXCEPTIONS'] =True
@@ -93,6 +93,9 @@ def tip():
             customer= cust_id1.id
             destination = stpacc2.id
             )
+        user1.transfer = Transfers(stpkey = charge.transfer, amount = (Int(charge.amount)/10))
+        db.session.add(user1)
+        db.session.commit()
     except stripe.error.CardError, e:
         body = e.json_body
         err  = body['error']
@@ -101,6 +104,7 @@ def tip():
          body = e.json_body
          err  = body['error']
          return Response(json.dumps(err))
+         
 @app.route('/create_user', methods=['POST'])
 def createUser():
     data = request.get_json(force=True)

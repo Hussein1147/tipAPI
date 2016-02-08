@@ -51,12 +51,17 @@ class User(Base, UserMixin):
     stpak = db.Column(db.String(255))
     custid = db.Column(db.String(255))
     authTok = db.Column(db.String(255))
+    transfer= relationship('transfers')
     roles = db.relationship('Role', secondary= roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User % >' % self.email
-        
+class Transfers(Base):
+    __tablename__ = 'transfers"
+    stpkey = db.Column(db.String(255))
+    amount = db.Column(db.Integer)
+    user_id= db.Column(Integer, ForeignKey('auth_user.id'))
     
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
 security = Security()
