@@ -46,9 +46,9 @@ def addCard():
                 },
                 )
             des = "Customer for"+" "+ userEmail
-             cus1 = stripe.Customer.create(
-             description =des,
-             source=token1.id
+            cus1 = stripe.Customer.create(
+            description =des,
+            source=token1.id
             )
             ##setting up stripe account
             stpacc1 = stripe.Account.create(
@@ -91,16 +91,8 @@ def tip():
             amount = amt,
             currency = "usd",
             customer= cust_id1.id
+            destination = stpacc2.id
             )
-         des = "Transfer for" + " " + userEmail   
-        transfer = stripe.Transfer.create(
-        amount = amt,
-        currency="usd",
-        destination = stpacc2,
-        source_transaction = charge.id,
-        description="Transfer for test@example.com"
-        )
-        
     except stripe.error.CardError, e:
         body = e.json_body
         err  = body['error']

@@ -50,7 +50,7 @@ class User(Base, UserMixin):
     login_count = db.Column(db.Integer)
     stpak = db.Column(db.String(255))
     custid = db.Column(db.String(255))
-    authTok = db.Cloumn(db.String(255))
+    authTok = db.Column(db.String(255))
     roles = db.relationship('Role', secondary= roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
