@@ -1,5 +1,5 @@
 import unicodedata
-import sys, os
+import sys, os,json
 import stripe
 from flask import Flask, jsonify, Response, request
 from flask_security import auth_token_required, http_auth_required
@@ -7,6 +7,8 @@ from models import app, user_datastore,User,db,Transfers
 from sqlalchemy.exc import IntegrityError,InvalidRequestError
 #Should be false in production mode
 app.config['PROPAGATE_EXCEPTIONS'] =True
+stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
+
 @app.route('/dummy-api')
 @auth_token_required
 def dummyAPI():
@@ -90,12 +92,20 @@ def tip():
             description="test.py",
             amount = amt,
             currency = "usd",
-            customer= cust_id1.id
-            destination = stpacc2.id
+            customer= cust_id1,
+            destination = stpacc2
             )
-        user1.transfer = Transfers(stpkey = charge.transfer, amount = (Int(charge.amount)/10))
-        db.session.add(user1)
+        emailKey = ""+ userEmail+""
+        trnasferID = charge.transfer
+        transfer= Transfers(stpkey = trnasferID, amount = (int(charge.amount)/10), email = userEmail, user_id= user1.id)
+        db.session.add(transfer)
         db.session.commit()
+        return jsonify(
+            success = True,
+            data = {
+            'msg': 'Success!! User has been tipped!',
+            }
+            )
     except stripe.error.CardError, e:
         body = e.json_body
         err  = body['error']
@@ -108,7 +118,7 @@ def tip():
 @app.route('/create_user', methods=['POST'])
 def createUser():
     data = request.get_json(force=True)
-    userName = unicodedata.normalize('NFKD', data['username']).encode('ascii','ignore')
+    userName = unicodedata.normalize('NFKD', data['userName']).encode('ascii','ignore')
     userPassword = unicodedata.normalize('NFKD', data['userPassword']).encode('ascii','ignore')
     userEmail= unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
 

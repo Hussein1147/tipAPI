@@ -1,11 +1,13 @@
 import json
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore,UserMixin, RoleMixin, login_required
+from sqlalchemy.orm.collections import attribute_mapped_collection
+
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@127.0.0.1:59891/tip'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@56aee17b0c1e66574300003d-jobos.rhcloud.com:59891/tip'
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'requiem_for_a_dream'
 app.config['SECURITY_TRACKABLE'] = True
@@ -36,7 +38,7 @@ class Role(Base, RoleMixin):
  
 class User(Base, UserMixin):
     __tablename__ = 'auth_user'
-    
+       
     email = db.Column(db.String(255), nullable=False, unique=True)
     password = db.Column(db.String(255), nullable=False)
     first_name = db.Column(db.String(255))
@@ -51,18 +53,21 @@ class User(Base, UserMixin):
     stpak = db.Column(db.String(255))
     custid = db.Column(db.String(255))
     authTok = db.Column(db.String(255))
-    transfer= relationship('transfers')
+    transfer= db.relationship('Transfers',backref='auth_user')
     roles = db.relationship('Role', secondary= roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
     def __repr__(self):
         return '<User % >' % self.email
+        
 class Transfers(Base):
-    __tablename__ = 'transfers"
+    __tablename__ = 'transfers'
     stpkey = db.Column(db.String(255))
     amount = db.Column(db.Integer)
-    user_id= db.Column(Integer, ForeignKey('auth_user.id'))
-    
+    email =  db.Column(db.String(45))
+    user_id= db.Column(db.Integer, db.ForeignKey('auth_user.id'))
+
+
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
 security = Security()
 security.init_app(app, user_datastore)

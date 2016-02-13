@@ -94,14 +94,7 @@ class TestCase(unittest.TestCase):
             customer= cus1.id,
             destination = stpacc2.id
             )
-        
-        # transfer= stripe.Transfer.create(
-        # amount=400,
-        # currency="usd",
-        # destination = stpacc2.id,
-        # source_transaction = charge.id,
-        # description="Transfer for test@example.com"
-        # )
+    
         
         print charge
         # self.assertIsNotNone(transfer.id)
@@ -116,9 +109,11 @@ class TestCase(unittest.TestCase):
         db.session.remove()
         db.drop_all()
     
-    # def trunCate(self):
-    #     db.drop_all()
-    # def reCreate(self):
-    #     db.create_all()
+    def trunCate(self):
+        db.drop_all()
+        db.create_all()
+
+    def reCreate(self):
+        db.create_all()
 if __name__ == '__main__':
     unittest.main()
