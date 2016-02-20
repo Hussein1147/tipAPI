@@ -15,12 +15,17 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['SECRET_KEY'] = 'super secret key'
 db = SQLAlchemy(app)
+<<<<<<< HEAD
 #adding comment for fun
 #cuz git does not have proper remote
 #adding comment for fun
 #cuz git does not have proper remote
 #adding comment for fun
 #cuz git does not have proper remote
+=======
+
+
+>>>>>>> openshift/master
 roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
 class Base(db.Model):
