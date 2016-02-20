@@ -16,6 +16,7 @@ app.config['WTF_CSRF_ENABLED'] = False
 app.config['SECRET_KEY'] = 'super secret key'
 db = SQLAlchemy(app)
 #adding comment for fun
+#cuz git does not have proper remote
 
 roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
