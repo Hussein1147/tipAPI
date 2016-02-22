@@ -2,23 +2,27 @@ import unicodedata
 import stripe
 import json
 from flask import jsonify, Response, request
-from flask_security import auth_token_required 
+# from flask_security import auth_token_required 
 from models import app, user_datastore,User,db,Transfers
 from sqlalchemy.exc import IntegrityError,InvalidRequestError
 
 app.config['PROPAGATE_EXCEPTIONS'] =True
 stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
+@app.route('/get_all_users', methods =['POST'])
+def get_users():
+    data = request.get_json(force=True)
+    userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    if User.query.filter(User.email == userEmail).one() is not None:
+        response = []
+        for user in db.session.query(User.first_name, User.email).all():
 
-@app.route('/dummy-api')
-@auth_token_required
-def dummyAPI():
-    dict = {
-        "Key1":"Value1",
-        "Key2":"value2"
-        }
-    return jsonify(items=dict)
-
-@app.route('/add_accounts',methods=['Post'])
+            response.append(user._asdict())
+        return jsonify(success=True, data=response)
+    else:
+        error="Some error occured"
+        return jsonify(success=False,data=error)
+            
+@app.route('/add_accounts', methods=['POST'])
 def addCard():
     data = request.get_json(force=True)
     userEmail=unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
