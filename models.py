@@ -1,6 +1,5 @@
-import json
 from flask import Flask
-from flask.ext.security import Security, SQLAlchemyUserDatastore,UserMixin, RoleMixin, login_required
+from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -13,7 +12,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['SECRET_KEY'] = 'super secret key'
 db = SQLAlchemy(app)
-
 
 roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
