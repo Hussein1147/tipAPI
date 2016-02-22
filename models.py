@@ -1,13 +1,11 @@
 import json
 from flask import Flask
 from flask.ext.security import Security, SQLAlchemyUserDatastore,UserMixin, RoleMixin, login_required
-from sqlalchemy.orm.collections import attribute_mapped_collection
-
 from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@56aee17b0c1e66574300003d-jobos.rhcloud.com:59891/tip'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@127.0.0.1:59891/tip'
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'requiem_for_a_dream'
 app.config['SECURITY_TRACKABLE'] = True
@@ -15,17 +13,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['WTF_CSRF_ENABLED'] = False
 app.config['SECRET_KEY'] = 'super secret key'
 db = SQLAlchemy(app)
-<<<<<<< HEAD
-#adding comment for fun
-#cuz git does not have proper remote
-#adding comment for fun
-#cuz git does not have proper remote
-#adding comment for fun
-#cuz git does not have proper remote
-=======
 
 
->>>>>>> openshift/master
 roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
 class Base(db.Model):

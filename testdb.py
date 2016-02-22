@@ -59,8 +59,8 @@ class TestCase(unittest.TestCase):
                 'currency' : 'usd'
                 },
                 )     
-        self.assertIsNotNone(token1.id)
-        self.assertIsNotNone(token2.id)
+      	self.assertIsNotNone(token1.id)
+       	self.assertIsNotNone(token2.id)
         
         cus1 = stripe.Customer.create(
         description ="Customer for test@example.com",

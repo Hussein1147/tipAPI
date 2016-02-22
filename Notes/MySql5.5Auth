@@ -9,4 +9,19 @@ Connection URL: mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/
 You can manage your new MySQL database by also embedding phpmyadmin.
 The phpmyadmin username and password will be the same as the MySQL credentials above.
 
-Cartridges 
+Cartridges
+
+
+http 127.0.0.1:8051/dummy-api Authentication-Token:WyIyIiwiNTFlNmQ2ODgyNWY1YjhkNWIxNjgwMGQ4NWQ1NGU5MDIiXQ.CZb3EA.2qVNOZ2c7826wCJBFMLOLimxxKU
+
+Adding accounts Local Testing:
+ http 127.0.0.1:8051/add_accounts userEmail=djibril@live.com userCardNumber=4000056655665556 userExpMonth=12 userExpYear=2023
+ 
+  http 127.0.0.1:8051/add_accounts userEmail=hussein@live.com userCardNumber=4000056655665556 userExpMonth=11 userExpYear=2019
+
+ Creating User Local Testing:
+  http 127.0.0.1:8051/create_user userName=Djibril userPassword=test123 userEmail=djibril@live.com
+  
+  
+ tiping Local testing:
+ http 127.0.0.1:8051/tip userEmail=hussein@live.com repEmail=djibril@live.com amount=1000 
