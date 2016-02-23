@@ -148,9 +148,8 @@ def follow_user():
     data = request.get_json(force=True)
     userEmail = unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
     followedEmail= unicodedata.normalize('NFKD', data['followedEmail']).encode('ascii','ignore')
-    currentUser = db.session.query.filter(User.email == userEmail).one()
-    followedUser = db.session.query.filter(User.email == followedEmail).one()
-
+    currentUser = User.query.filter(User.email == userEmail).one()
+    followedUser = User.query.filter(User.email == followedEmail).one()
     if currentUser.is_following(followedUser) is not True:
         u = currentUser.follow(followedUser)
         db.session.add(u)

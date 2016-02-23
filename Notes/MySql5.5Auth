@@ -21,7 +21,9 @@ Adding accounts Local Testing:
 
  Creating User Local Testing:
   http 127.0.0.1:8051/create_user userName=Djibril userPassword=test123 userEmail=djibril@live.com
+  http 127.0.0.1:8051/create_user userName=hussein  userPassword=test123 userEmail=hussein@live.com
   
   
  tiping Local testing:
- http 127.0.0.1:8051/tip userEmail=hussein@live.com repEmail=djibril@live.com amount=1000 
+ 
+http 127.0.0.1:8051/tip userEmail=hussein@live.com repEmail=djibril@live.com amount=1000 

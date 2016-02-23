@@ -21,7 +21,8 @@ class TestCase(unittest.TestCase):
         db.session.add(u1)
         db.session.add(u2)
         db.session.commit()
-        u1.follow(u2)
+        u = u1.follow(u2)
+        print u
         assert u1.is_following(u2)
         print u1.followed.first().first_name
         assert u1.followed.first().first_name != None

@@ -57,17 +57,15 @@ class User(Base, UserMixin):
                              'User',
                              secondary= followers,
                              primaryjoin="followers.c.follower_id == User.id", 
-                             secondaryjoin="followers.c.followed_id == User.id)", 
+                             secondaryjoin="followers.c.followed_id == User.id", 
                              backref=db.backref('followers', lazy='dynamic'), 
                              lazy='dynamic')
-
-    def __repr__(self):
-        return '<User % >' % self.email
-   
+    
     def follow(self,user):
         if not self.is_following(user):
             self.followed.append(user)
-   
+        return self 
+    
     def get_followers(self):
         db.session.query(User.first_name,User.email).join(followers.c.followed_id == User.id).\
                 filter(followers.c.follower_id == self.id).order_by(User.name.asc()).all()
