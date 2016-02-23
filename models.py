@@ -4,7 +4,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@127.0.0.1:59893/tip'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://adminVu2uiWr:AtZ6dRthSnWt@56aee17b0c1e66574300003d-jobos.rhcloud.com:59891/tip'
 app.config['SECURITY_PASSWORD_HASH'] = 'pbkdf2_sha512'
 app.config['SECURITY_PASSWORD_SALT'] = 'requiem_for_a_dream'
 app.config['SECURITY_TRACKABLE'] = True
