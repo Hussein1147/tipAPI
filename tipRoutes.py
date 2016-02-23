@@ -143,5 +143,23 @@ def createUser():
     except InvalidRequestError, e:
         db.session.rollback()
         return Response(e)
+@app.route('/follow', methods=['POST'])
+def follow_user():
+    data = request.get_json(force=True)
+    userEmail = unicodedata.normalize('NFKD', data['userEmail']).encode('ascii','ignore')
+    followedEmail= unicodedata.normalize('NFKD', data['followedEmail']).encode('ascii','ignore')
+    currentUser = db.session.query.filter(User.email == userEmail).one()
+    followedUser = db.session.query.filter(User.email == followedEmail).one()
+
+    if currentUser.is_following(followedUser) is not True:
+        u = currentUser.follow(followedUser)
+        db.session.add(u)
+        db.session.commit()
+        response = "Now Following" +" "+ followedUser.first_name
+        return jsonify(success=True, data=response)
+    else:
+        response = "This user is already being followed"
+        return jsonify(success=False,data=response)
+
 if __name__ == '__main__':
     app.run()

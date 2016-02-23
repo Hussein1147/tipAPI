@@ -15,7 +15,18 @@ class TestCase(unittest.TestCase):
         stripe.api_key = 'sk_test_OM2dp9YnI2w5eNuUKtrxd56g'
         db.drop_all()
         db.create_all()
-
+    def test_follow(self):
+        u1 = User(first_name='Djibril',email='Djibrilhms@gmail.com', password='xyzhv')
+        u2 = User(first_name='hussein',email='Djibril@live.com', password='xyzhv')
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.commit()
+        u1.follow(u2)
+        assert u1.is_following(u2)
+        print u1.followed.first().first_name
+        assert u1.followed.first().first_name != None
+        u1.unfollow(u2)
+        assert u1.followed.count() == 0
     def addCard(self):
         u1 = User(first_name='Djibril',email='Djibrilhms@gmail.com', password='xyzhv')
         c1 = Card(CardNumber='4000056655665556',expYear='2017',expMonth='12',User_id=u1.id)
@@ -108,12 +119,13 @@ class TestCase(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-    
+        db.create_all()
+ 
     def trunCate(self):
         db.drop_all()
         db.create_all()
 
-    def reCreate(self):
-        db.create_all()
+   # def reCreate(self):
+   #     db.create_all()
 if __name__ == '__main__':
     unittest.main()

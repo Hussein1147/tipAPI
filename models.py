@@ -15,6 +15,7 @@ db = SQLAlchemy(app)
 
 roles_users = db.Table('roles_users',db.Column('user_id', db.Integer(), db.ForeignKey('auth_user.id')),db.Column('role_id', db.Integer(), db.ForeignKey('auth_role.id')))
 
+followers = db.Table('followers', db.Column('follower_id',db.Integer(),db.ForeignKey('auth_user.id')), db.Column('followed_id', db.Integer(), db.ForeignKey('auth_user.id')))
 class Base(db.Model):
     __abstract__ = True
     id = db.Column(db.Integer(), primary_key=True)
@@ -52,18 +53,39 @@ class User(Base, UserMixin):
     transfer= db.relationship('Transfers',backref='auth_user')
     roles = db.relationship('Role', secondary= roles_users,
                             backref=db.backref('users', lazy='dynamic'))
+    followed= db.relationship(
+                             'User',
+                             secondary= followers,
+                             primaryjoin="followers.c.follower_id == User.id", 
+                             secondaryjoin="followers.c.followed_id == User.id)", 
+                             backref=db.backref('followers', lazy='dynamic'), 
+                             lazy='dynamic')
 
     def __repr__(self):
         return '<User % >' % self.email
-        
+   
+    def follow(self,user):
+        if not self.is_following(user):
+            self.followed.append(user)
+   
+    def get_followers(self):
+        db.session.query(User.first_name,User.email).join(followers.c.followed_id == User.id).\
+                filter(followers.c.follower_id == self.id).order_by(User.name.asc()).all()
+   
+    def unfollow(self,user):
+        if self.is_following(user):
+            self.followed.remove(user)
+            return self
+   
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id ==user.id).count() > 0
 class Transfers(Base):
     __tablename__ = 'transfers'
     stpkey = db.Column(db.String(255))
     amount = db.Column(db.Integer)
     email =  db.Column(db.String(45))
     user_id= db.Column(db.Integer, db.ForeignKey('auth_user.id'))
-
-
+db.create_all()
 user_datastore = SQLAlchemyUserDatastore(db, User,Role)
 security = Security()
 security.init_app(app, user_datastore)
