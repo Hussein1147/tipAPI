@@ -26,4 +26,19 @@ Adding accounts Local Testing:
   
  tiping Local testing:
  
-http 127.0.0.1:8051/tip userEmail=hussein@live.com repEmail=djibril@live.com amount=1000 
+http 127.0.0.1:8051/tip userEmail=hussein@live.com repEmail=djibril@live.com amount=1000
+# here are some openshif solution re:ssh and how to generate ssh keys
+Start fresh by removing all your existing ssh keys by deleting .ssh/ directory in the user’s home directory.
+rm -r ~/.ssh
+Delete the .openshift directory as well.
+rm -r ~/.openshift
+
+express.conf file in the .openshift directory holds the authorization details such as user logon email, so you don’t have to enter login information every time a rhc command is issued.
+
+Generate a new SSH key manually.
+Make sure not to use `sudo` with either `ssh-keygen` or the `rhc setup` commands below, as this may leads to files with invalid access permissions.
+ssh-keygen -t rsa -b 4096 -C "your_email_here"
+ssh-add ~/.ssh/id_rsa
+Upload the generated public key to OpenShift servers, so they can identify you as an authorized user.
+Open ‘id_rsa.pub’ in a text editor and copy the content inside. Then in your OpenShift Web Console, go to `settings` > `Add a new key` and paste the content of your public key file there.
+ 
